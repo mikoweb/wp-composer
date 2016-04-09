@@ -23,10 +23,20 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * @author Rafał Mikołajun <rafal@mikoweb.pl>
  * @package WordPress Silex
- * @package WordPress
+ * @subpackage WordPress
  */
 class InitApp
 {
+    /**
+     * @var ContainerBuilder
+     */
+    private $container;
+
+    /**
+     * @var Application
+     */
+    private $app;
+
     /**
      * @param string $rootPath
      * 
@@ -34,19 +44,61 @@ class InitApp
      */
     public function init($rootPath)
     {
-        try {
-            $config = Yaml::parse(file_get_contents($rootPath . '/../config/config.yml'));
-            $container = new ContainerBuilder();
-            $extension = new CoreExtension();
-            $extension->load($config, $container);
-        } catch (\Exception $e) {
-            die($e->getMessage());
-        }
-
         require_once($rootPath . '/wp-load.php');
         wp();
 
-        $app = new Application($container);
+        $app = $this->getApp($rootPath);
+        $app->setTwigGlobals($this->wpGlobals());
+
+        if ($this->canAppRun($app)) {
+            $app->run();
+        } else {
+            echo $this->wpTemplateData();
+        }
+    }
+
+    /**
+     * @param string $rootPath
+     *
+     * @return ContainerBuilder
+     */
+    private function getContainer($rootPath)
+    {
+        if (!$this->container) {
+            try {
+                $config = Yaml::parse(file_get_contents($rootPath . '/../config/config.yml'));
+                $this->container = new ContainerBuilder();
+                $extension = new CoreExtension();
+                $extension->load($config, $this->container);
+            } catch (\Exception $e) {
+                die($e->getMessage());
+            }
+        }
+
+        return $this->container;
+    }
+
+    /**
+     * @param string $rootPath
+     *
+     * @return Application
+     */
+    private function getApp($rootPath)
+    {
+        if (!$this->app) {
+            $this->app = new Application($this->getContainer($rootPath));
+        }
+
+        return $this->app;
+    }
+
+    /**
+     * @param Application $app
+     *
+     * @return bool
+     */
+    private function canAppRun(Application $app)
+    {
         $requestContext = $app['request_context'];
         $requestContext->fromRequest(Request::createFromGlobals());
         $urlMatcher = new UrlMatcher($app['routes'], $requestContext);
@@ -58,10 +110,33 @@ class InitApp
             $appRun = false;
         }
 
-        if ($appRun) {
-            $app->run();
-        } else {
-            require_once(ABSPATH . WPINC . '/template-loader.php');
+        return $appRun;
+    }
+
+    /**
+     * @return array
+     */
+    private function wpTemplateData()
+    {
+        ob_start();
+        require(ABSPATH . WPINC . '/template-loader.php');
+        $output = ob_get_contents();
+        ob_end_clean();
+
+        return $output;
+    }
+
+    /**
+     * @return array
+     */
+    public function wpGlobals()
+    {
+        global $posts, $post, $wp_did_header, $wp_query, $wp_rewrite, $wpdb, $wp_version, $wp, $id, $comment, $user_ID;
+
+        if (is_array( $wp_query->query_vars)) {
+            extract( $wp_query->query_vars, EXTR_SKIP );
         }
+
+        return get_defined_vars();
     }
 }

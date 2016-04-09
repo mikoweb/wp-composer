@@ -168,6 +168,17 @@ class Application extends Silex\Application
         return $this->dirEntity;
     }
 
+    /**
+     * @param array $variables
+     */
+    public function setTwigGlobals(array $variables)
+    {
+        $twig = $this->container->get('twig');
+        foreach ($variables as $name=>$val) {
+            $twig->addGlobal($name, $val);
+        }
+    }
+
     private function createTwig()
     {
         /** @var \Twig_Environment $twig */
@@ -212,7 +223,6 @@ class Application extends Silex\Application
 
         /** @var \Twig_Environment $twig */
         $twig = $this->container->get('twig');
-        $twig->addGlobal('app', $this);
         $context = $this['request_context'];
         $context->fromRequest(Request::createFromGlobals());
         unset($this["url_generator"]);
@@ -231,7 +241,7 @@ class Application extends Silex\Application
         $this->container->set('url_generator', $this['url_generator']);
     }
 
-    public function createDoctrine()
+    private function createDoctrine()
     {
         $this->register(new Silex\Provider\DoctrineServiceProvider(), array(
             'db.options' => [
