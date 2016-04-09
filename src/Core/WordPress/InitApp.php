@@ -129,7 +129,7 @@ class InitApp
     /**
      * @return array
      */
-    public function wpGlobals()
+    private function wpGlobals()
     {
         global $posts, $post, $wp_did_header, $wp_query, $wp_rewrite, $wpdb, $wp_version, $wp, $id, $comment, $user_ID;
 
