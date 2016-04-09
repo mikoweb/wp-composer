@@ -80,7 +80,7 @@ class Application extends Silex\Application
             $this['debug'] = $container->getParameter('core.debug');
             $this->dirCache = $dirRoot . '/cache';
             $this->dirConfig = $dirRoot . '/config';
-            $this->dirView = $dirRoot . '/view';
+            $this->dirView = $dirRoot . '/views';
             $this->dirWeb = $dirRoot . '/public_html/wp-content/themes';
             $this->dirEntity = $dirRoot . '/src/App/Entity';
 
@@ -177,6 +177,7 @@ class Application extends Silex\Application
 
         $twigLoader->addPath($this->getDirView());
         $twigLoader->addPath($this->getDirView(), 'root');
+        $twigLoader->addPath(get_template_directory() . '/views', 'template');
 
         try {
             $taggedServices = $this->container->findTaggedServiceIds('twig.extension');
