@@ -186,9 +186,16 @@ class Application extends Silex\Application
         /** @var \Twig_Loader_Filesystem $twigLoader */
         $twigLoader = $this->container->get('twig_loader');
 
+        $templateDir = get_template_directory() . '/views';
+        if (file_exists($templateDir . '/override')) {
+            $twigLoader->addPath($templateDir . '/override');
+        }
         $twigLoader->addPath($this->getDirView());
         $twigLoader->addPath($this->getDirView(), 'root');
-        $twigLoader->addPath(get_template_directory() . '/views', 'template');
+        if (file_exists($templateDir)) {
+            $twigLoader->addPath($templateDir, 'theme');
+        }
+        $twigLoader->addPath($this->getDirView() . '/theme', 'theme');
 
         try {
             $taggedServices = $this->container->findTaggedServiceIds('twig.extension');
