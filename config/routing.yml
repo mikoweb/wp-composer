@@ -1,0 +1,3 @@
+app_hello_world:
+    resource: "routing/hello-world.yml"
+    prefix:   /hello-world

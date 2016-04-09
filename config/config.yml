@@ -1,0 +1,8 @@
+core:
+    debug: true
+    database:
+        host: localhost
+        driver: pdo_mysql
+        user: root
+        password: ~
+        dbname: dev_wp

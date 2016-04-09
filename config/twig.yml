@@ -1,0 +1,23 @@
+services:
+    twig_loader:
+        class:     \Twig_Loader_Filesystem
+        arguments: []
+    twig:
+        class:     \Twig_Environment
+        arguments: [@twig_loader, {strict_variables: true, autoescape: true}]
+
+    debug.twig.extension:
+        class: Twig_Extension_Debug
+        tags:
+            - { name: twig.extension }
+
+    text.twig.extension:
+        class: Twig_Extensions_Extension_Text
+        tags:
+            - { name: twig.extension }
+
+    asset.twig.extension:
+        class: "Entea\Twig\Extension\AssetExtension"
+        arguments: [@silex]
+        tags:
+            - { name: twig.extension }

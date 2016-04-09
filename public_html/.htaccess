@@ -38,3 +38,15 @@ deny from all
 # blokada plików wykonywalnych
 RewriteRule ^(wp-content|wp-includes|wp-admin/includes)/.*\.(htaccess|htpasswd|php.*|pl|py|jsp|asp|htm|shtml|html.*|sh|cgi|spl|scgi|fcgi)$ - [F]
 </IfModule>
+
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /public_html/
+RewriteRule ^bootstrap\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /public_html/bootstrap.php [L]
+</IfModule>
+
+# END WordPress
