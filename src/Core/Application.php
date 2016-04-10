@@ -181,6 +181,7 @@ class Application extends Silex\Application
 
     private function createTwig()
     {
+        $this['request'] = Request::createFromGlobals();
         /** @var \Twig_Environment $twig */
         $twig = $this->container->get('twig');
         /** @var \Twig_Loader_Filesystem $twigLoader */

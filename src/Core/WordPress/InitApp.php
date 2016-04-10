@@ -49,6 +49,7 @@ class InitApp
 
         $app = $this->getApp($rootPath);
         $app->setTwigGlobals($this->wpGlobals());
+        Twig::setContainer($this->getContainer($rootPath));
 
         if ($this->canAppRun($app)) {
             $app->run();
